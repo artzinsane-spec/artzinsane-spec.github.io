@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Draw on Image</title>
+  <style>
+    canvas { border: 1px solid #000; }
+    #signature { margin-top: 10px; width: 300px; }
+    #save { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="600" height="400"></canvas><br>
+  <input type="text" id="signature" placeholder="Ваша подпись"><br>
+  <button id="save">Сохранить как изображение</button>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = "background.jpg"; // Замените на ваше изображение
+
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+
+    // Простая реализация рисования
+    let isDrawing = false;
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Сохранение с подписью
+    document.getElementById('save').onclick = () => {
+      const sign = document.getElementById('signature').value;
+      if (sign) {
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText(sign, 10, canvas.height - 10);
+      }
+      const link = document.createElement('a');
+      link.download = 'result.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    };
+  </script>
+</body>
+</html>
